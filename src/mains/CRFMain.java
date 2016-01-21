@@ -4,8 +4,15 @@ import java.io.*;
 import java.util.*;
 import java.text.ParseException;
 
+import edu.umass.cs.mallet.grmm.inference.Inferencer;
+import edu.umass.cs.mallet.grmm.inference.LoopyBP;
+import edu.umass.cs.mallet.grmm.inference.TRP;
+import edu.umass.cs.mallet.grmm.types.Assignment;
+import edu.umass.cs.mallet.grmm.types.AssignmentIterator;
 import edu.umass.cs.mallet.grmm.types.Factor;
+import edu.umass.cs.mallet.grmm.types.FactorGraph;
 import edu.umass.cs.mallet.grmm.types.LogTableFactor;
+import edu.umass.cs.mallet.grmm.types.VarSet;
 import edu.umass.cs.mallet.grmm.types.Variable;
 
 public class CRFMain {
@@ -15,13 +22,13 @@ public class CRFMain {
     public static void createNodeGraph (String fileName) {
         
         //file format
-        //line1 nodeNum featureNum
+        //line1 nodeNum featureNum classNum
         //line2~N node_i label_i_j feautures 
         BufferedReader file;
         String line;
         int numNode;
         int numFeature;
-        int numState;
+        int numClass;
 
         try {
                 file = new BufferedReader(new FileReader(fileName));
@@ -30,15 +37,17 @@ public class CRFMain {
                 numFeature = para[1];
                 numState = 13;
                 Variable[] allVars = new Variable[numNode];
-                for (int i=0; i<allVars.length; i++)
-                    allVars[i] = new Variable(numState);
+                double [] arr = new double[numClass];//question: how to put another array in each arr[i]
                 
-                while ((line = file.readLine()) != null) {
-                     
+                for (int i=0; i<allVars.length; i++) {
+                    allVars[i] = new Variable(numClass);
+                    
+                    if ((line = file.readLine()) != null) {
+                        String[] tmp = line.split(" ");
+                        //write to arr
+                        Factor ptl = LogTableFava ctor.makeFromValues(new Variable[] {allVars[i]}, arr);
+                    }
                 }
-
-
-
                 file.close();
             } catch (Exception e) {
                 e.printStackTrace();
