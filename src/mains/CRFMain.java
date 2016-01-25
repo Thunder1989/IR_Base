@@ -88,10 +88,10 @@ public class CRFMain {
             while ((line = file.readLine()) != null) {
                 tmp = line.split(",");
                 int[] tFeature = new int[numFeature];
-                int classIdx = Integer.parseInt(tmp[1]);
-                int start = 2;
+                int classIdx = Integer.parseInt(tmp[0]);
+                int start = 1;
                 for (int i=start; i<tmp.length; i++)
-                    tFeature[i-2] = Integer.parseInt(tmp[i]);
+                    tFeature[i-start] = Integer.parseInt(tmp[i]);
                 
                 tMap.put(classIdx, tFeature);
                 if (classIdx == numClass-1) {
@@ -121,16 +121,20 @@ public class CRFMain {
     }
     
     public static void main(String[] args) throws IOException, ParseException {
-        String inputFile = "./test.csv";
+        String inputFile = "./fn_rice.txt";
         loadData(inputFile);
         
         ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0, featureTable, label); 
         alr.train(featureTable, label);
-        
+       
+        int ctr = 0;
         for (int i=0; i<featureTable.size(); i++) {
             HashMap<Integer, int[]> tmp = featureTable.get(i);
-            System.out.println(alr.predict(tmp)+" "+alr.score(tmp, label[i]));
+            if (alr.predict(tmp) == label[i]) ctr++;
+            //System.out.println(alr.predict(tmp)+" "+alr.score(tmp, label[i]));
         }
+        System.out.println("training acc = " + 1.0*ctr/label.length);
+        
         //step 1
         //loadNodeFeture();
         //createNodeFactor();

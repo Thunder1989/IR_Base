@@ -91,9 +91,11 @@ public class ALogisticRegression {
 		int offset = 0;
 		for(int i = 0; i < m_classNo; i++){			
 			offset = i * (m_featureSize + 1);
-			int[] tmp = Xi.get(i);
+			/*for debugging
+            int[] tmp = Xi.get(i);
             for (int j=0; j<tmp.length; j++)
                 System.out.println(tmp[j]);
+            */
             prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);			
 		}
 		
