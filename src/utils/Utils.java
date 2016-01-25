@@ -170,8 +170,18 @@ public class Utils {
 		}
 		return result;
 	}
+
+    //new dotproduct by hdz
+	public static double dotProduct(double[] beta, int[] f, int offset){
+		double sum = beta[offset];
+		for(int i = 0; i < f.length; i++){
+			int index = i + offset + 1;
+			sum += beta[index] * f[i];
+		}
+		return sum;
+	}
 	
-	//The function defines the dot product of beta and sparse Vector of a document.
+    //The function defines the dot product of beta and sparse Vector of a document.
 	public static double dotProduct(double[] beta, _SparseFeature[] sf, int offset){
 		double sum = beta[offset];
 		for(int i = 0; i < sf.length; i++){

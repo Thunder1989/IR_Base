@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import java.text.ParseException;
 
+import Classifier.supervised.ALogisticRegression;
+/*
 import edu.umass.cs.mallet.grmm.inference.Inferencer;
 import edu.umass.cs.mallet.grmm.inference.LoopyBP;
 import edu.umass.cs.mallet.grmm.inference.TRP;
@@ -14,11 +16,17 @@ import edu.umass.cs.mallet.grmm.types.FactorGraph;
 import edu.umass.cs.mallet.grmm.types.LogTableFactor;
 import edu.umass.cs.mallet.grmm.types.VarSet;
 import edu.umass.cs.mallet.grmm.types.Variable;
+*/
 
 public class CRFMain {
     
     public static int[][] nameFeature;
-
+    public static int numIns;
+    public static int numFeature;
+    public static int numClass;
+    public static ArrayList<HashMap<Integer, int[]>> featureTable;
+    public static int[] label;
+    /*
     public static void createNodeGraph (String fileName) {
         
         //file format
@@ -53,6 +61,52 @@ public class CRFMain {
                 e.printStackTrace();
             }
     }
+    */
+
+    public static void loadData (String fileName) {
+        BufferedReader file;
+        String line;
+
+        try {
+            file = new BufferedReader(new FileReader(fileName));
+            String[] para = file.readLine().split(",");
+            numIns = Integer.parseInt(para[0]);
+            numFeature = Integer.parseInt(para[1]);
+            numClass = Integer.parseInt(para[2]);
+            System.out.println("# of instance: "+numIns);
+            System.out.println("# of feature: "+numFeature);
+            System.out.println("# of class: "+numClass);
+            
+            featureTable = new ArrayList<HashMap<Integer, int[]>> ();
+            label = new int[numIns];
+            String[] tmp = file.readLine().split(",");
+            for (int i=0; i<tmp.length; i++)
+                label[i] = Integer.parseInt(tmp[i]);
+            
+            int ctr = 0;
+            HashMap<Integer, int[]> tMap = new HashMap<Integer, int[]> ();
+            while ((line = file.readLine()) != null) {
+                tmp = line.split(",");
+                int[] tFeature = new int[numFeature];
+                int classIdx = Integer.parseInt(tmp[1]);
+                int start = 2;
+                for (int i=start; i<tmp.length; i++)
+                    tFeature[i-2] = Integer.parseInt(tmp[i]);
+                
+                tMap.put(classIdx, tFeature);
+                if (classIdx == numClass-1) {
+                    featureTable.add(tMap);
+                    tMap = new HashMap<Integer, int[]> ();
+                    //System.out.println("Alist: "+featureTable);
+                }
+            }
+
+            file.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     public static void generateRanInput () {
         Random rd = new Random();
@@ -68,15 +122,25 @@ public class CRFMain {
     
     public static void main(String[] args) throws IOException, ParseException {
         String inputFile = "./test.csv";
+        loadData(inputFile);
+        
+        ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0, featureTable, label); 
+        alr.train(featureTable, label);
+        
+        for (int i=0; i<featureTable.size(); i++) {
+            HashMap<Integer, int[]> tmp = featureTable.get(i);
+            System.out.println(alr.predict(tmp)+" "+alr.score(tmp, label[i]));
+        }
         //step 1
-        loadNodeFeture();
-        createNodeFactor();
+        //loadNodeFeture();
+        //createNodeFactor();
 
-        loadEdgeFeture();
-        createEdgeFactor();
+        //loadEdgeFeture();
+        //createEdgeFactor();
 
         //step 2
-        trainCRF();
+        //trainCRF();
+        
 
     }
 }
