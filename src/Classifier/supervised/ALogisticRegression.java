@@ -10,12 +10,8 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import Classifier.BaseClassifier;
-//import LogisticRegression;
 import LBFGS.LBFGS;
 import LBFGS.LBFGS.ExceptionWithIflag;
-import structures._Corpus;
-import structures._Doc;
-import structures._SparseFeature;
 import utils.Utils;
 
 //public class ALogisticRegression extends LogisticRegression {
@@ -30,15 +26,6 @@ public class ALogisticRegression {
 	ArrayList<HashMap<Integer, int[]>> trainX;
     int[] trainY;
 
-	public ALogisticRegression(_Corpus c, double lambda){
-		//super(c);
-		m_beta = new double[m_classNo * (m_featureSize + 1)]; //Initialization.
-		m_g = new double[m_beta.length];
-		m_diag = new double[m_beta.length];
-		m_cache = new double[m_classNo];
-		m_lambda = lambda;
-	}
-	
 	public ALogisticRegression(int classNo, int featureSize, double lambda, ArrayList<HashMap<Integer, int[]>> X, int[] Y){
 		//super(classNo, featureSize);
 		m_classNo = classNo;
@@ -167,7 +154,8 @@ public class ALogisticRegression {
         return m_cache[classNo] - Utils.logSumOfExponentials(m_cache);//in log space
 	}
 	
-	//Save the parameters for classification.
+    
+    //Save the parameters for classification.
 	public void saveModel(String modelLocation){
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(modelLocation), "UTF-8"));
