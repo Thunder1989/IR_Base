@@ -134,7 +134,7 @@ public class CRFMain {
             e.printStackTrace();
         } 
         
-        //Step2: create train and test idx for the given fold
+        //Step2: create train and test idx for each fold
         ArrayList<Integer> index = new ArrayList<Integer> ();    
         for (int i=0; i<label.length; i++)
             index.add(i);
@@ -145,7 +145,7 @@ public class CRFMain {
         for (int i=0; i<fold; i++) {
             int len=0, offset=0, train_length=0;
             if (i==fold-1) {
-                //last fold takes the integer portion + all the remaining idx
+                //last fold takes the remaining modulus idx
                 len = (label.length)/fold + (label.length)%fold;
             }
             else {
@@ -163,17 +163,19 @@ public class CRFMain {
             for (int j=0; j<train_length; j++) 
                 train.add(index.get((j+offset)%label.length));
         
+            ArrayList<Integer> debug = train;
             //initiate labeled set with TL-labeled instances
             ArrayList<Integer> al_idx = new ArrayList<Integer> ();
             ArrayList<Integer> al_y = new ArrayList<Integer> ();
             ArrayList<Integer> tmpList = new ArrayList<Integer> ();
             for (int j=0; j<train.size(); j++) {
-                if (TL_table.containsKey(train.get(j))) {
-                    al_idx.add(train.get(j));
-                    al_y.add(TL_table.get(train.get(j)));
+                int idx = train.get(j);
+                if (TL_table.containsKey(idx)) {
+                    al_idx.add(idx);
+                    al_y.add(TL_table.get(idx));
                 }
                 else {
-                    tmpList.add(train.get(j));
+                    tmpList.add(idx);
                 }
             }
             //removed labeled from train list
@@ -183,13 +185,18 @@ public class CRFMain {
             ArrayList<HashMap<Integer, int[]>> trainX = new ArrayList<HashMap<Integer, int[]>> ();
             int[] trainY;
             ArrayList<Double> acc = new ArrayList<Double> ();
-            int itr = 10; //# of iterations for AL
+            int itr = 300; //# of iterations for AL
+            Random rn = new Random();
             for (int j=0; j<itr; j++) {
-                if (j != 0) {
-                    int tmp = getQueryID(learner, train);//ID to query
-                    al_idx.add(train.get(tmp));
-                    al_y.add(label[tmp]);
+                if (j != 0) {//1st iteration use TL labeled to train
+                    //int tmp = getQueryID(learner, train);//idx in trainlist to query, real instance ID is train.get(tmp)
+                    int tmp = rn.nextInt(train.size());
+                    int idx = train.get(tmp);
+                    al_idx.add(idx);
+                    al_y.add(label[idx]);
                     train.remove(tmp);
+                    //System.out.print("idx-"+idx+", ");
+                    //System.out.println("y-"+label[idx]);
                 }
                 
                 trainY = new int[al_idx.size()];
@@ -198,29 +205,53 @@ public class CRFMain {
                     trainY[k]= al_y.get(k);
                 }
                 
-                //T-DO: is this problematic since we only see part of the labels?
+                //TO-DO: is this problematic since we only see part of the labels?
                 learner.train(trainX, trainY);
-                System.out.format("training of fold %d itr %d done..\n", i+1, j);
+                //System.out.format("training of fold %d itr %d done..\n", i+1, j);
                 acc.add(getAcc(learner, test));
             }
-            for (int j=0; j<acc.size(); j++)
-                System.out.print(acc.get(j)+",");
-            System.out.println();
-
-              
+            System.out.println(acc + ";");
+            
+            //debugging: full k-1 fold as training - checked and worked OK
+            /*
+            al_idx = new ArrayList<Integer> ();
+            al_y = new ArrayList<Integer> ();
+            trainX = new ArrayList<HashMap<Integer, int[]>> ();
+            train = debug;
+            for (int j=0; j<train.size(); j++) {
+                int idx = train.get(j);
+                al_idx.add(idx);
+                al_y.add(label[idx]);
+            }
+            trainY = new int[al_idx.size()];
+            for (int k=0; k<al_idx.size(); k++) {
+                trainX.add(featureTable.get(al_idx.get(k)));
+                trainY[k]= al_y.get(k);
+            }
+            learner.train(trainX, trainY);
+            double debug_score = getAcc(learner, test);
+            System.out.println("full fold acc-"+debug_score);
+            */  
         }
     }
     
-    public static int getQueryID(ALogisticRegression learner, ArrayList<Integer> trainID ) {
-        //TBD
-        return 0;
+    public static int getQueryID(ALogisticRegression learner, ArrayList<Integer> trainID) {
+        ArrayList<Double> scoreList = new ArrayList<Double> ();
+        for (int i=0; i<trainID.size(); i++) {
+            int idx = trainID.get(i);
+            scoreList.add(learner.score(featureTable.get(idx), learner.predict(featureTable.get(idx)))); 
+        }
+
+        return scoreList.indexOf(Collections.min(scoreList));
     }
    
     public static double getAcc(ALogisticRegression learner, ArrayList<Integer> testID ) {
         int ctr = 0;
         for (int i=0; i<testID.size(); i++) {
-            HashMap<Integer, int[]> tmp = featureTable.get(i);
-            if (learner.predict(tmp) == label[i]) ctr++;
+            int idx = testID.get(i);
+            HashMap<Integer, int[]> tmp = featureTable.get(idx);
+            if (learner.predict(tmp) == label[idx]) ctr++;
+            //System.out.println("id-"+idx+"\tpredicted-"+learner.predict(tmp)+"\ttrue-"+label[idx]);
         }
         return 1.0*ctr/testID.size();
     }
