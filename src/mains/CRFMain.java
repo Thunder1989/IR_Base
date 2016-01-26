@@ -185,7 +185,7 @@ public class CRFMain {
             ArrayList<HashMap<Integer, int[]>> trainX = new ArrayList<HashMap<Integer, int[]>> ();
             int[] trainY;
             ArrayList<Double> acc = new ArrayList<Double> ();
-            int itr = 300; //# of iterations for AL
+            int itr = 10; //# of iterations for AL
             Random rn = new Random();
             for (int j=0; j<itr; j++) {
                 if (j != 0) {//1st iteration use TL labeled to train
@@ -195,15 +195,17 @@ public class CRFMain {
                     al_idx.add(idx);
                     al_y.add(label[idx]);
                     train.remove(tmp);
-                    //System.out.print("idx-"+idx+", ");
-                    //System.out.println("y-"+label[idx]);
+                    System.out.println("idx-"+idx+", y-"+label[idx]);
                 }
                 
                 trainY = new int[al_idx.size()];
+                int ctr=0;
                 for (int k=0; k<al_idx.size(); k++) {
                     trainX.add(featureTable.get(al_idx.get(k)));
                     trainY[k]= al_y.get(k);
+                    if(al_y.get(k) == label[al_idx.get(k)]) ctr++;
                 }
+                if (j==itr-1) System.out.println("labeled set acc"+ 1.0*ctr/trainY.length);
                 
                 //TO-DO: is this problematic since we only see part of the labels?
                 learner.train(trainX, trainY);
@@ -212,12 +214,14 @@ public class CRFMain {
             }
             System.out.println(acc + ";");
             
-            //debugging: full k-1 fold as training - checked and worked OK
-            /*
+            /* for debugging, works both ways k-1/1 as training  
             al_idx = new ArrayList<Integer> ();
             al_y = new ArrayList<Integer> ();
             trainX = new ArrayList<HashMap<Integer, int[]>> ();
             train = debug;
+            ArrayList<Integer> tmp = train;
+            train = test;
+            test = tmp;
             for (int j=0; j<train.size(); j++) {
                 int idx = train.get(j);
                 al_idx.add(idx);
@@ -231,7 +235,7 @@ public class CRFMain {
             learner.train(trainX, trainY);
             double debug_score = getAcc(learner, test);
             System.out.println("full fold acc-"+debug_score);
-            */  
+            */ 
         }
     }
     
