@@ -45,10 +45,10 @@ public class ALogisticRegression {
 	}
 
 	/*
-	 * Calculate the beta by using bfgs. In this method, we give a starting
-	 * point and iterating the algorithm to find the minimum value for the beta.
+	 * Calculate beta using bfgs. In this method, we give a starting
+	 * point and iterating the algorithm to find the minimum value for beta.
 	 * The input is the vector of feature[14], we need to pass the function
-	 * value for the point, together with the gradient vector. When the iflag
+	 * value for the point, together with the gradient vector. When iflag
 	 * turns to 0, it finds the final point and we get the best beta.
 	 */	
 	public double train(ArrayList<HashMap<Integer, int[]>> trainX, int[] trainY) {
@@ -70,16 +70,11 @@ public class ALogisticRegression {
 		return fValue;
 	}
 	
-	//This function is used to calculate Pij = P(Yi=j|Xi) in multi-class LR.
-	protected void calcPosterior(HashMap<Integer, int[]> Xi, double[] prob){
+	//calculate Pij = P(Yi=j|Xi) in multi-class LR.
+	protected void calcPosterior(HashMap<Integer, int[]> Xi, double[] prob) {
 		int offset = 0;
 		for(int i = 0; i < m_classNo; i++){			
 			offset = i * (m_featureSize + 1);
-			/*for debugging
-            int[] tmp = Xi.get(i);
-            for (int j=0; j<tmp.length; j++)
-                System.out.println(tmp[j]);
-            */
             prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);			
 		}
 		
@@ -88,7 +83,7 @@ public class ALogisticRegression {
 			prob[i] = Math.exp(prob[i] - logSum);
 	}
 	
-	//This function is used to calculate the value and gradient with the new beta.
+	//calculate the value and gradient with the new beta.
 	protected double calcFuncGradient(ArrayList<HashMap<Integer, int[]>> trainX, int[] trainY) {		
 		double gValue = 0, fValue = 0;
 		double Pij = 0, logPij = 0;
@@ -101,7 +96,7 @@ public class ALogisticRegression {
 			L2 += b * b;
 		}
 		
-		//The computation complexity is n*classNo.
+		//time complexity is n*classNo.
 	    for (int i=0; i< trainY.length; i++) {
             //trainSet is ArrayList<HashMap<int, int[]>>
             //each element is the feature table for an instance
