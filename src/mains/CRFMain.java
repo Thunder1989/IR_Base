@@ -178,8 +178,9 @@ public class CRFMain {
                     tmpList.add(idx);
                 }
             }
-            //removed labeled from train list
+            //remove labeled from train list
             train = tmpList;
+            System.out.println("labeled set-"+al_idx.size());
             
             //active learning based on the LR score of prediction
             ArrayList<HashMap<Integer, int[]>> trainX = new ArrayList<HashMap<Integer, int[]>> ();
@@ -209,12 +210,11 @@ public class CRFMain {
                 
                 //TO-DO: is this problematic since we only see part of the labels?
                 learner.train(trainX, trainY);
-                //System.out.format("training of fold %d itr %d done..\n", i+1, j);
                 acc.add(getAcc(learner, test));
             }
             System.out.println(acc + ";");
             
-            /* for debugging, works both ways k-1/1 as training  
+            /* for debugging, works both ways k-1/1 fold as training  
             al_idx = new ArrayList<Integer> ();
             al_y = new ArrayList<Integer> ();
             trainX = new ArrayList<HashMap<Integer, int[]>> ();
@@ -249,7 +249,7 @@ public class CRFMain {
         return scoreList.indexOf(Collections.min(scoreList));
     }
    
-    public static double getAcc(ALogisticRegression learner, ArrayList<Integer> testID ) {
+    public static double getAcc(ALogisticRegression learner, ArrayList<Integer> testID) {
         int ctr = 0;
         for (int i=0; i<testID.size(); i++) {
             int idx = testID.get(i);
