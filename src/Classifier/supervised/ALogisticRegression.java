@@ -23,10 +23,8 @@ public class ALogisticRegression {
 	double[] m_g, m_diag;
 	double[] m_cache;
 	double m_lambda;
-	ArrayList<HashMap<Integer, int[]>> trainX;
-    int[] trainY;
 
-	public ALogisticRegression(int classNo, int featureSize, double lambda, ArrayList<HashMap<Integer, int[]>> X, int[] Y){
+	public ALogisticRegression(int classNo, int featureSize, double lambda){
 		//super(classNo, featureSize);
 		m_classNo = classNo;
         m_featureSize = featureSize;
@@ -35,8 +33,6 @@ public class ALogisticRegression {
 		m_diag = new double[m_beta.length];
 		m_cache = new double[m_classNo];
 		m_lambda = lambda;
-        trainX = X;
-        trainY= Y;
 	}
 	
 	public String toString() {
@@ -59,8 +55,9 @@ public class ALogisticRegression {
 		int[] iflag = {0}, iprint = { -1, 3 };
 		double fValue = 0;
 		int fSize = m_beta.length;
+	    System.out.println("train len in LR ------------- "+trainX.size());	
 		
-		init();
+        init();
 		try{
 			do {
 				fValue = calcFuncGradient(trainX, trainY);

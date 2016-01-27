@@ -186,7 +186,7 @@ public class CRFMain {
             ArrayList<HashMap<Integer, int[]>> trainX = new ArrayList<HashMap<Integer, int[]>> ();
             int[] trainY;
             ArrayList<Double> acc = new ArrayList<Double> ();
-            int itr = 10; //# of iterations for AL
+            int itr = 2; //# of iterations for AL
             Random rn = new Random();
             for (int j=0; j<itr; j++) {
                 if (j != 0) {//1st iteration use TL labeled to train
@@ -209,24 +209,28 @@ public class CRFMain {
                 if (j==itr-1) System.out.println("labeled set acc"+ 1.0*ctr/trainY.length);
                 
                 //TO-DO: is this problematic since we only see part of the labels?
-                learner.train(trainX, trainY);
+                //learner.train(trainX, trainY);
                 acc.add(getAcc(learner, test));
             }
             System.out.println(acc + ";");
             
-            /* for debugging, works both ways k-1/1 fold as training  
+            // for debugging, works both ways k-1/1 fold as training  
             al_idx = new ArrayList<Integer> ();
             al_y = new ArrayList<Integer> ();
             trainX = new ArrayList<HashMap<Integer, int[]>> ();
             train = debug;
-            ArrayList<Integer> tmp = train;
-            train = test;
-            test = tmp;
-            for (int j=0; j<train.size(); j++) {
-                int idx = train.get(j);
+            //ArrayList<Integer> tmp = train;
+            //train = test;
+            //test = tmp;
+            //for (int j=0; j<train.size(); j++) {
+            for (int j=0; j<100; j++) {
+                int id = rn.nextInt(train.size());
+                int idx = train.get(id);
+                train.remove(id);
+                //int idx = train.get(j);
                 al_idx.add(idx);
                 al_y.add(label[idx]);
-            }
+            } 
             trainY = new int[al_idx.size()];
             for (int k=0; k<al_idx.size(); k++) {
                 trainX.add(featureTable.get(al_idx.get(k)));
@@ -235,7 +239,6 @@ public class CRFMain {
             learner.train(trainX, trainY);
             double debug_score = getAcc(learner, test);
             System.out.println("full fold acc-"+debug_score);
-            */ 
         }
     }
     
@@ -264,7 +267,7 @@ public class CRFMain {
         String inputFile = "./fn_rice.txt";
         loadData(inputFile);
         
-        ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0, featureTable, label); 
+        ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0); 
         
         crossValidation(alr, 10);
         
