@@ -96,7 +96,7 @@ public class ALogisticRegression {
 		}
 		
 		//time complexity is n*classNo.
-	    for (int i=0; i< trainY.length; i++) {
+	    for (int i=0; i<trainY.length; i++) {
             //trainSet is ArrayList<HashMap<int, int[]>>
             //each element is the feature table for an instance
             //features for each class label k is instance.get(k)
@@ -107,7 +107,7 @@ public class ALogisticRegression {
             
             //compute P(Y=j|X=xi)
             calcPosterior(Xi, m_cache);
-            for(int j = 0; j < m_classNo; j++){
+            for(int j = 0; j < m_classNo; j++) {
                 Pij = m_cache[j];
                 logPij = Math.log(Pij);
                 if (Yi == j){
@@ -115,7 +115,7 @@ public class ALogisticRegression {
                     fValue += logPij * weight;
                 } else
                     gValue = Pij;
-                gValue *= weight;//weight might be different for different documents
+                gValue *= weight;//weight might be different for different instances
                 
                 int offset = j * (m_featureSize + 1);
                 m_g[offset] += gValue;

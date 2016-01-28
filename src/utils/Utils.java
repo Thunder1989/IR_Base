@@ -174,9 +174,9 @@ public class Utils {
     //new dotproduct by hdz
 	public static double dotProduct(double[] beta, int[] f, int offset){
 		double sum = beta[offset];
-		for(int i = 0; i < f.length; i++){
-			int index = i + offset + 1;
-			sum += beta[index] * f[i];
+        for(int i = 0; i < f.length; i++) {
+			int idx = i + offset + 1;
+			sum += beta[idx] * f[i];
 		}
 		return sum;
 	}
