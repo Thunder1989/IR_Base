@@ -55,7 +55,6 @@ public class ALogisticRegression {
 		int[] iflag = {0}, iprint = { -1, 3 };
 		double fValue = 0;
 		int fSize = m_beta.length;
-	    System.out.println("train len in LR ------------- "+trainX.size());	
 		
         init();
 		try{
