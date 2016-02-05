@@ -40,10 +40,11 @@ public class CRFLearner {
 		Arrays.fill(m_diag, 0);
 	}
 
-    //step1: given node and edge features input, construct factor graph
-    //      --use LogTable, each of arr[] is the w^T * x
-    //step2: compute gradients
-    //step3: 
+    //step1: given node and edge features input, construct factor graphs then iterate the following:
+    //step2: use LogTable, each of arr[] is the w^T * x for corresponding class k
+    //step2: compute fV = logProbSum(AllEx) - L2 
+    //step3: compute gradients
+    //step4: pass -fV and gV to LBFGS 
 
 	/*
 	 * Calculate beta using bfgs. In this method, we give a starting
@@ -60,8 +61,8 @@ public class CRFLearner {
         init();
 		try{
 			do {
-				fValue = calcFuncGradient(trainX, trainY); //TBF
-				LBFGS.lbfgs(fSize, 6, m_beta, fValue, m_g, false, m_diag, iprint, 1e-4, 1e-20, iflag);
+				fValue = calcFuncGradient(trainX, trainY); //TBD				
+                LBFGS.lbfgs(fSize, 6, m_beta, fValue, m_g, false, m_diag, iprint, 1e-4, 1e-20, iflag);
 			} while (iflag[0] != 0);
 		} catch (ExceptionWithIflag e){
 			e.printStackTrace();
