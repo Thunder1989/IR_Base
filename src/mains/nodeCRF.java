@@ -5,20 +5,13 @@ import java.util.*;
 import java.text.ParseException;
 
 import Classifier.supervised.ALogisticRegression;
-/*
 import edu.umass.cs.mallet.grmm.inference.Inferencer;
+import edu.umass.cs.mallet.grmm.inference.JunctionTreeInferencer;
 import edu.umass.cs.mallet.grmm.inference.LoopyBP;
 import edu.umass.cs.mallet.grmm.inference.TRP;
-import edu.umass.cs.mallet.grmm.types.Assignment;
-import edu.umass.cs.mallet.grmm.types.AssignmentIterator;
-import edu.umass.cs.mallet.grmm.types.Factor;
-import edu.umass.cs.mallet.grmm.types.FactorGraph;
-import edu.umass.cs.mallet.grmm.types.LogTableFactor;
-import edu.umass.cs.mallet.grmm.types.VarSet;
-import edu.umass.cs.mallet.grmm.types.Variable;
-*/
+import edu.umass.cs.mallet.grmm.types.*;
 
-public class CRFMain {
+public class nodeCRF {
     
     public static int numIns;
     public static int numFeature;
@@ -26,43 +19,6 @@ public class CRFMain {
     public static ArrayList<HashMap<Integer, int[]>> featureTable;
     public static int[] label;
     
-    /*
-    public static void createNodeGraph (String fileName) {
-        
-        //file format
-        //line1 nodeNum featureNum classNum
-        //line2~N node_i label_i_j feautures 
-        BufferedReader file;
-        String line;
-        int numNode;
-        int numFeature;
-        int numClass;
-
-        try {
-                file = new BufferedReader(new FileReader(fileName));
-                String[] para = file.readLine().split(" ");
-                numNode = para[0];
-                numFeature = para[1];
-                numState = 13;
-                Variable[] allVars = new Variable[numNode];
-                double [] arr = new double[numClass];//question: how to put another array in each arr[i]
-                
-                for (int i=0; i<allVars.length; i++) {
-                    allVars[i] = new Variable(numClass);
-                    
-                    if ((line = file.readLine()) != null) {
-                        String[] tmp = line.split(" ");
-                        //write to arr
-                        Factor ptl = LogTableFava ctor.makeFromValues(new Variable[] {allVars[i]}, arr);
-                    }
-                }
-                file.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-    }
-    */
-
     public static void loadData (String fileName) {
         BufferedReader file;
         String line;
@@ -157,13 +113,13 @@ public class CRFMain {
             offset = i*(label.length/fold); 
             for (int j=0; j<len; j++)
                 test.add(index.get(j+offset));
-        
+            
             train = new ArrayList<Integer> ();
             train_length = label.length-len;
             offset += len; 
             for (int j=0; j<train_length; j++) 
                 train.add(index.get((j+offset)%label.length));
-        
+            
             ArrayList<Integer> debug = train;
             //initiate labeled set with TL-labeled instances
             ArrayList<HashMap<Integer, int[]>> trainX = new ArrayList<HashMap<Integer, int[]>> ();
@@ -249,7 +205,7 @@ public class CRFMain {
 
         return scoreList.indexOf(Collections.min(scoreList));
     }
-   
+    
     public static double getAcc(ALogisticRegression learner, ArrayList<Integer> testID) {
         int ctr = 0;
         for (int i=0; i<testID.size(); i++) {
@@ -268,17 +224,6 @@ public class CRFMain {
         ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0); 
         
         crossValidation(alr, 10);
-        
-        //TO-DO, for CRF with edge features
-        //step 1
-        //loadNodeFeture();
-        //createNodeFactor();
-
-        //loadEdgeFeture();
-        //createEdgeFactor();
-
-        //step 2
-        //trainCRF();
         
     }
 }
