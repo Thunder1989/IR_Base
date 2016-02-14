@@ -83,26 +83,21 @@ public class CRFLearner {
 	}
 	
 	//calculate Pij = P(Yi=j|Xi) in multi-class LR.
-	//resort to Inferencer like LBP -- computeMarginals -> lookupMarginal(AssgnIt)
+	//use Inferencer like LBP -- computeMarginals -> lookupMarginal(AssgnIt)
 	protected void calcPosterior(FractorGraph fg, double[] prob) {
 		m_infer.computeMarginals(fg);//begin to collect the expectations
 		for(int index=0; index<sample.factorList.size(); index++)
 		{				
-			if ( m_mask != null && m_mask.containsKey(sample.featureType.get(index))
-					&& m_mask.get(sample.featureType.get(index)).booleanValue() == false )
-				continue;
-			
 			factor = sample.factorList.get(index);
 			ptl = m_infer.lookupMarginal(factor.varSet());
 			feaID = m_featureMap.get( sample.featureType.get(index) ).intValue();					
 		
+			int class = 0;
 			AssignmentIterator assnIt = ptl.assignmentIterator ();
 			while (assnIt.hasNext ()) {
-				feaValue = factor.logValue(assnIt);//feature value;
-				prob = ptl.value (assnIt);//get the marginal probability for this local configuration
-				m_exptectations[feaID] += feaValue * prob;
+				prob[class++] = ptl.value (assnIt);//get the marginal probability for this local configuration
 				assnIt.advance ();
-			}				
+			}
 		}
 
 

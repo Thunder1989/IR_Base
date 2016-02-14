@@ -24,7 +24,7 @@ public class ALogisticRegression {
 	double[] m_cache;
 	double m_lambda;
 
-	public ALogisticRegression(int classNo, int featureSize, double lambda){
+	public ALogisticRegression(int classNo, int featureSize, double lambda) {
 		//super(classNo, featureSize);
 		m_classNo = classNo;
         m_featureSize = featureSize;
@@ -62,7 +62,7 @@ public class ALogisticRegression {
 				fValue = calcFuncGradient(trainX, trainY);
 				LBFGS.lbfgs(fSize, 6, m_beta, fValue, m_g, false, m_diag, iprint, 1e-4, 1e-20, iflag);
 			} while (iflag[0] != 0);
-		} catch (ExceptionWithIflag e){
+		} catch (ExceptionWithIflag e) {
 			e.printStackTrace();
 		}
 		
@@ -72,10 +72,10 @@ public class ALogisticRegression {
 	//calculate Pij = P(Yi=j|Xi) in multi-class LR.
 	protected void calcPosterior(HashMap<Integer, int[]> Xi, double[] prob) {
 		int offset = 0;
-		for(int i = 0; i < m_classNo; i++){			
+		for(int i = 0; i < m_classNo; i++) {
 			offset = i * (m_featureSize + 1);
-            prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);			
-		}
+            prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);
+        }
 		
 		double logSum = Utils.logSumOfExponentials(prob);
 		for(int i = 0; i < m_classNo; i++)
@@ -83,7 +83,7 @@ public class ALogisticRegression {
 	}
 	
 	//calculate the value and gradient with the new beta.
-	protected double calcFuncGradient(ArrayList<HashMap<Integer, int[]>> trainX, int[] trainY) {		
+	protected double calcFuncGradient(ArrayList<HashMap<Integer, int[]>> trainX, int[] trainY) {
 		double gValue = 0, fValue = 0;
 		double Pij = 0, logPij = 0;
 
@@ -129,6 +129,28 @@ public class ALogisticRegression {
 		return m_lambda*L2 - fValue;
 	}
 	
+	public double calcFI(HashMap<Integer, int[]> Xi, int Yi) {
+		double gValue = 0, Pij = 0, score = 0;
+            
+        calcPosterior(Xi, m_cache);
+        for(int j = 0; j < m_classNo; j++) {
+            Pij = m_cache[j];
+            if (Yi == j){
+                gValue = Pij - 1.0;
+            } else
+                gValue = Pij;
+            
+            double tmp = 0;
+            int[] Xij = Xi.get(j);
+            for(int k=0; k<Xij.length; k++)
+                tmp += Xij[k] * Xij[k];
+            tmp *= gValue * gValue;
+            score += tmp * Pij;
+        }
+
+		return score;
+	}
+
 	public int predict(HashMap<Integer, int[]> Xi) {
 		for(int i = 0; i < m_classNo; i++) {
 		    int[] fv = Xi.get(i);

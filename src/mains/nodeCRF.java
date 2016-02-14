@@ -27,7 +27,7 @@ public class nodeCRF {
             file = new BufferedReader(new FileReader(fileName));
             String[] para = file.readLine().split(",");
             numIns = Integer.parseInt(para[0]);
-            numFeature = Integer.parseInt(para[1])-3;
+            numFeature = Integer.parseInt(para[1]);
             numClass = Integer.parseInt(para[2]);
             System.out.println("# of instance: "+numIns);
             System.out.println("# of feature: "+numFeature);
@@ -46,7 +46,7 @@ public class nodeCRF {
                 int[] tFeature = new int[numFeature];
                 int classIdx = Integer.parseInt(tmp[0]);
                 int start = 1;
-                for (int i=start; i<tmp.length-3; i++)
+                for (int i=start; i<tmp.length; i++)
                     tFeature[i-start] = Integer.parseInt(tmp[i]);
                 
                 tMap.put(classIdx, tFeature);
@@ -145,7 +145,8 @@ public class nodeCRF {
             Random rn = new Random();
             for (int j=0; j<itr; j++) {
                 if (j != 0) {//1st iteration uses TL labeled to train
-                    int tmp = getQueryID(learner, train);//idx in trainlist to query, real instance ID is train.get(tmp)
+                    int tmp = getIDByFI(learner, train);//get ID by FI, idx in trainlist to query, real instance ID is train.get(tmp)
+                    //int tmp = getIDByUncertainty(learner, train);//get ID by uncertainty - posterior prob
                     //int tmp = rn.nextInt(train.size()); //random sampling
                     int idx = train.get(tmp);
                     trainX.add(featureTable.get(idx));
@@ -196,7 +197,17 @@ public class nodeCRF {
         //System.out.println("full fold ave testing acc: "+ acc_/fold);
     }
     
-    public static int getQueryID(ALogisticRegression learner, ArrayList<Integer> trainID) {
+    public static int getIDByFI(ALogisticRegression learner, ArrayList<Integer> trainID) {
+        ArrayList<Double> scoreList = new ArrayList<Double> ();
+        for (int i=0; i<trainID.size(); i++) {
+            int idx = trainID.get(i);
+            scoreList.add(learner.calcFI(featureTable.get(idx), label[idx])); 
+        }
+        
+        return scoreList.indexOf(Collections.max(scoreList));
+    }
+    
+    public static int getIDByUncertainty(ALogisticRegression learner, ArrayList<Integer> trainID) {
         ArrayList<Double> scoreList = new ArrayList<Double> ();
         for (int i=0; i<trainID.size(); i++) {
             int idx = trainID.get(i);
