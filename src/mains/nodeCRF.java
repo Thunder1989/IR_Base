@@ -5,11 +5,6 @@ import java.util.*;
 import java.text.ParseException;
 
 import Classifier.supervised.ALogisticRegression;
-import edu.umass.cs.mallet.grmm.inference.Inferencer;
-import edu.umass.cs.mallet.grmm.inference.JunctionTreeInferencer;
-import edu.umass.cs.mallet.grmm.inference.LoopyBP;
-import edu.umass.cs.mallet.grmm.inference.TRP;
-import edu.umass.cs.mallet.grmm.types.*;
 
 public class nodeCRF {
     
@@ -96,7 +91,7 @@ public class nodeCRF {
             index.add(i);
         Collections.shuffle(index);
 
-        int itr = 100;//# of iterations for AL
+        int itr = 50;//# of iterations for AL
         ArrayList<Integer> train;
         ArrayList<Integer> test;
         for (int i=0; i<fold; i++) {
@@ -201,7 +196,7 @@ public class nodeCRF {
         ArrayList<Double> scoreList = new ArrayList<Double> ();
         for (int i=0; i<trainID.size(); i++) {
             int idx = trainID.get(i);
-            scoreList.add(learner.calcFI(featureTable.get(idx), label[idx])); 
+            scoreList.add(learner.calcFI(featureTable.get(idx))); 
         }
         
         return scoreList.indexOf(Collections.max(scoreList));

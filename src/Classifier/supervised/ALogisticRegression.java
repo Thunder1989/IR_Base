@@ -129,25 +129,26 @@ public class ALogisticRegression {
 		return m_lambda*L2 - fValue;
 	}
 	
-	public double calcFI(HashMap<Integer, int[]> Xi, int Yi) {
-		double gValue = 0, Pij = 0, score = 0;
-            
-        calcPosterior(Xi, m_cache);
-        for(int j = 0; j < m_classNo; j++) {
-            Pij = m_cache[j];
-            if (Yi == j){
-                gValue = Pij - 1.0;
-            } else
-                gValue = Pij;
-            
-            double tmp = 0;
-            int[] Xij = Xi.get(j);
-            for(int k=0; k<Xij.length; k++)
-                tmp += Xij[k] * Xij[k];
-            tmp *= gValue * gValue;
-            score += tmp * Pij;
-        }
+	public double calcFI(HashMap<Integer, int[]> Xi) {
+		double gValue = 0, Pij = 0, Pij_ = 0, tmp = 0, score = 0;
 
+        calcPosterior(Xi, m_cache);
+        for(int Yi = 0; Yi < m_classNo; Yi++) {
+            Pij_ = m_cache[Yi];
+            tmp = 0;
+            for(int j = 0; j < m_classNo; j++) {
+                Pij = m_cache[j];
+                if (Yi == j){
+                    gValue = Pij - 1.0;
+                } else
+                    gValue = Pij;
+                
+                int[] Xij = Xi.get(j);
+                for(int k=0; k<Xij.length; k++)
+                    tmp += Math.pow(Xij[k]*gValue, 2);
+            }
+            score += tmp * Pij_;
+        }
 		return score;
 	}
 
