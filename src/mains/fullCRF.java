@@ -3,10 +3,13 @@ package mains;
 import java.io.*;
 import java.util.*;
 import java.text.ParseException;
+import java.lang.reflect.*;
 
 import Classifier.supervised.ALogisticRegression;
-import edu.umass.cs.mallet.grmm.inference.*;
-import edu.umass.cs.mallet.grmm.types.*;
+import cc.mallet.grmm.types.*;
+import cc.mallet.grmm.inference.*;
+//import edu.umass.cs.mallet.grmm.inference.*;
+//import edu.umass.cs.mallet.grmm.types.*;
 
 public class fullCRF {
 
@@ -248,10 +251,18 @@ public class fullCRF {
         }
         return 1.0*ctr/testID.size();
     }
-
+    
+    //for debugging, print out list of valid methods for the class
+    public static void checkMethods(Object o) {
+        Class c = o.getClass();
+        for (Method method : c.getDeclaredMethods()) {
+            System.out.println(method.getName());
+        }
+    }
+    
     public static void main(String[] args) throws IOException, ParseException {
         String inputFile = "./fn_rice.txt";
-        loadData(inputFile);
+        //loadData(inputFile);
         
         //ALogisticRegression alr = new ALogisticRegression(numClass, numFeature, 1.0); 
         
@@ -259,6 +270,7 @@ public class fullCRF {
         
         FactorGraph mdl = new FactorGraph ();
       Variable[] vars = new Variable [] {
+              new Variable (2),
               new Variable (2),
               new Variable (2),
       };
@@ -272,8 +284,10 @@ public class fullCRF {
        */
       double[] arr = new double[] { 0.6, 1.3, 0.3, 2.3, };
       mdl.addFactor (vars[0], vars[1], arr);
-      // arr = new double[] { 0.6, 1.3};
-      // mdl.addFactor (new TableFactor(vars[0], arr));
+      arr = new double[] { 1.6, 0.3, 1.3, 1.6, };
+      mdl.addFactor (vars[1], vars[2], arr);
+      arr = new double[] { 0.6, 1.3};
+      mdl.addFactor (new TableFactor(vars[0], arr));
       // arr = new double[] { 0.3, 0.3};
       // mdl.addFactor (new TableFactor(vars[1], arr));
 
@@ -284,8 +298,8 @@ public class fullCRF {
         Inferencer inf = new LoopyBP ();
         inf.computeMarginals (mdl);
 
-
-   for (int varnum = 0; varnum < vars.length; varnum++) {
+        
+      for (int varnum = 0; varnum < vars.length; varnum++) {
       Variable var = vars[varnum];
       Factor ptl = inf.lookupMarginal (var);
       for (AssignmentIterator it = ptl.assignmentIterator (); it.hasNext (); it.advance()) {
@@ -305,5 +319,5 @@ public class fullCRF {
         //step 2
         //trainCRF();
 
-}
+    }
 }

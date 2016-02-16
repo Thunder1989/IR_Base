@@ -99,7 +99,6 @@ public class CRFLearner {
 			}
 		}
 
-
 		int offset = 0;
 		for(int i = 0; i < m_classNo; i++) {
             offset = i * (m_featureSize + 1);
