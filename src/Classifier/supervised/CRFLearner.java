@@ -18,7 +18,6 @@ import edu.umass.cs.mallet.grmm.inference.*;
 import edu.umass.cs.mallet.grmm.types.*;
 
 
-//public class ALogisticRegression extends LogisticRegression {
 public class CRFLearner {
 
 	int m_classNo;

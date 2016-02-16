@@ -91,7 +91,7 @@ public class nodeCRF {
             index.add(i);
         Collections.shuffle(index);
 
-        int itr = 50;//# of iterations for AL
+        int itr = 100;//# of iterations for AL
         ArrayList<Integer> train;
         ArrayList<Integer> test;
         for (int i=0; i<fold; i++) {
