@@ -288,26 +288,19 @@ public class fullCRF {
       mdl.addFactor (vars[1], vars[2], arr);
       arr = new double[] { 0.6, 1.3};
       mdl.addFactor (new TableFactor(vars[0], arr));
-      // arr = new double[] { 0.3, 0.3};
-      // mdl.addFactor (new TableFactor(vars[1], arr));
+      mdl.dump();
 
-      System.out.println ("Model with one edge potential:");
-      mdl.dump ();
-
-
-        Inferencer inf = new LoopyBP ();
-        inf.computeMarginals (mdl);
-
+      Inferencer inf = new LoopyBP();
+      inf.computeMarginals(mdl);
         
-      for (int varnum = 0; varnum < vars.length; varnum++) {
-      Variable var = vars[varnum];
-      Factor ptl = inf.lookupMarginal (var);
+      Factor ptl = inf.lookupMarginal (mdl.getFactor(0));
       for (AssignmentIterator it = ptl.assignmentIterator (); it.hasNext (); it.advance()) {
-        int outcome = it.indexOfCurrentAssn ();
-        System.out.println (var+"  "+outcome+"   "+ptl.value (it));
+          int outcome = it.indexOfCurrentAssn ();
+          System.out.println (outcome+"   "+ptl.value(it));
       }
-      System.out.println ();
-    }
+
+        double p = inf.lookupLogJoint(new Assignment(new Variable[] {vars[0],vars[1], vars[2]}, new int[] {0,0,0}));
+        System.out.println(p);
         //TO-DO, for CRF with edge features
         //step 1
         //loadNodeFeture();
