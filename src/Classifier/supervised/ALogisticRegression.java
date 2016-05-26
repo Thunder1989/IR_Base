@@ -19,7 +19,7 @@ public class ALogisticRegression {
 
 	int m_classNo;
 	int m_featureSize;
-    double[] m_beta;
+	double[] m_beta;
 	double[] m_g, m_diag;
 	double[] m_cache;
 	double m_lambda;
@@ -27,22 +27,22 @@ public class ALogisticRegression {
 	public ALogisticRegression(int classNo, int featureSize, double lambda) {
 		//super(classNo, featureSize);
 		m_classNo = classNo;
-        m_featureSize = featureSize;
+		m_featureSize = featureSize;
         m_beta = new double[m_classNo * (m_featureSize + 1)]; //Initialization.
-		m_g = new double[m_beta.length];
-		m_diag = new double[m_beta.length];
-		m_cache = new double[m_classNo];
-		m_lambda = lambda;
-	}
-	
-	public String toString() {
-		return String.format("Logistic Regression[C:%d, F:%d, L:%.2f]", m_classNo, m_featureSize, m_lambda);
-	}
-	
-	protected void init() {
-		Arrays.fill(m_beta, 0);
-		Arrays.fill(m_diag, 0);
-	}
+        m_g = new double[m_beta.length];
+        m_diag = new double[m_beta.length];
+        m_cache = new double[m_classNo];
+        m_lambda = lambda;
+    }
+    
+    public String toString() {
+    	return String.format("Logistic Regression[C:%d, F:%d, L:%.2f]", m_classNo, m_featureSize, m_lambda);
+    }
+    
+    protected void init() {
+    	Arrays.fill(m_beta, 0);
+    	Arrays.fill(m_diag, 0);
+    }
 
 	/*
 	 * Calculate beta using bfgs. In this method, we give a starting
@@ -56,7 +56,7 @@ public class ALogisticRegression {
 		double fValue = 0;
 		int fSize = m_beta.length;
 		
-        init();
+		init();
 		try{
 			do {
 				fValue = calcFuncGradient(trainX, trainY);
@@ -74,8 +74,8 @@ public class ALogisticRegression {
 		int offset = 0;
 		for(int i = 0; i < m_classNo; i++) {
 			offset = i * (m_featureSize + 1);
-            prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);
-        }
+			prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);
+		}
 		
 		double logSum = Utils.logSumOfExponentials(prob);
 		for(int i = 0; i < m_classNo; i++)
@@ -96,25 +96,25 @@ public class ALogisticRegression {
 		}
 		
 		//time complexity is n*classNo.
-	    for (int i=0; i<trainY.length; i++) {
+		for (int i=0; i<trainY.length; i++) {
             //trainSet is ArrayList<HashMap<int, int[]>>
             //each element is the feature table for an instance
             //features for each class label k is instance.get(k)
-            HashMap<Integer, int[]> Xi = trainX.get(i);
-            int Yi = trainY[i];
-            double weight;
+			HashMap<Integer, int[]> Xi = trainX.get(i);
+			int Yi = trainY[i];
+			double weight;
             weight = 1; //no weighting right now
             
             //compute P(Y=j|X=xi)
             calcPosterior(Xi, m_cache);
             for(int j = 0; j < m_classNo; j++) {
-                Pij = m_cache[j];
-                logPij = Math.log(Pij);
-                if (Yi == j){
-                    gValue = Pij - 1.0;
-                    fValue += logPij * weight;
-                } else
-                    gValue = Pij;
+            	Pij = m_cache[j];
+            	logPij = Math.log(Pij);
+            	if (Yi == j){
+            		gValue = Pij - 1.0;
+            		fValue += logPij * weight;
+            	} else
+            	gValue = Pij;
                 gValue *= weight;//weight might be different for different instances
                 
                 int offset = j * (m_featureSize + 1);
@@ -122,57 +122,57 @@ public class ALogisticRegression {
                 //(Yij - Pij) * Xi
                 int[] Xij = Xi.get(j);
                 for(int k=0; k<Xij.length; k++)
-                    m_g[offset + k + 1] += gValue * Xij[k];
-                }
+                	m_g[offset + k + 1] += gValue * Xij[k];
+            }
         }
 		// LBFGS is used to calculate the minimum value while we are trying to calculate the maximum likelihood.
-		return m_lambda*L2 - fValue;
-	}
-	
-	public double calcFI(HashMap<Integer, int[]> Xi) {
-		double gValue = 0, Pij = 0, Pij_ = 0, tmp = 0, score = 0;
+        return m_lambda*L2 - fValue;
+    }
+    
+    public double calcFI(HashMap<Integer, int[]> Xi) {
+    	double gValue = 0, Pij = 0, Pij_ = 0, tmp = 0, score = 0;
 
-        calcPosterior(Xi, m_cache);
-        for(int Yi = 0; Yi < m_classNo; Yi++) {
-            Pij_ = m_cache[Yi];
-            tmp = 0;
-            for(int j = 0; j < m_classNo; j++) {
-                Pij = m_cache[j];
-                if (Yi == j){
-                    gValue = Pij - 1.0;
-                } else
-                    gValue = Pij;
-                
-                int[] Xij = Xi.get(j);
-                for(int k=0; k<Xij.length; k++)
-                    tmp += Math.pow(Xij[k]*gValue, 2);
-            }
-            score += tmp * Pij_;
-        }
-		return score;
-	}
+    	calcPosterior(Xi, m_cache);
+    	for(int Yi = 0; Yi < m_classNo; Yi++) {
+    		Pij_ = m_cache[Yi];
+    		tmp = 0;
+    		for(int j = 0; j < m_classNo; j++) {
+    			Pij = m_cache[j];
+    			if (Yi == j){
+    				gValue = Pij - 1.0;
+    			} else
+    			gValue = Pij;
+    			
+    			int[] Xij = Xi.get(j);
+    			for(int k=0; k<Xij.length; k++)
+    				tmp += Math.pow(Xij[k]*gValue, 2);
+    		}
+    		score += tmp * Pij_;
+    	}
+    	return score;
+    }
 
-	public int predict(HashMap<Integer, int[]> Xi) {
-		for(int i = 0; i < m_classNo; i++) {
-		    int[] fv = Xi.get(i);
-			m_cache[i] = Utils.dotProduct(m_beta, fv, i * (m_featureSize + 1));
-        }
-        return Utils.maxOfArrayIndex(m_cache);
-	}
-	
-	public double score(HashMap<Integer, int[]> Xi, int classNo) {
-		for(int i = 0; i < m_classNo; i++) {
-		    int[] fv = Xi.get(i);
-			m_cache[i] = Utils.dotProduct(m_beta, fv, i * (m_featureSize + 1));
-        }
+    public int predict(HashMap<Integer, int[]> Xi) {
+    	for(int i = 0; i < m_classNo; i++) {
+    		int[] fv = Xi.get(i);
+    		m_cache[i] = Utils.dotProduct(m_beta, fv, i * (m_featureSize + 1));
+    	}
+    	return Utils.maxOfArrayIndex(m_cache);
+    }
+    
+    public double score(HashMap<Integer, int[]> Xi, int classNo) {
+    	for(int i = 0; i < m_classNo; i++) {
+    		int[] fv = Xi.get(i);
+    		m_cache[i] = Utils.dotProduct(m_beta, fv, i * (m_featureSize + 1));
+    	}
         return m_cache[classNo] - Utils.logSumOfExponentials(m_cache);//in log space
-	}
-	
+    }
+    
     
     //Save the parameters for classification.
-	public void saveModel(String modelLocation){
-		try {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(modelLocation), "UTF-8"));
+    public void saveModel(String modelLocation){
+    	try {
+    		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(modelLocation), "UTF-8"));
 			int offset, fSize = m_featureSize;//does not include bias and time features
 			for(int i=0; i<fSize; i++) {
 				//writer.write(m_corpus.getFeature(i));

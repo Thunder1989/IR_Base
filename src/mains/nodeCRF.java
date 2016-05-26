@@ -140,8 +140,8 @@ public class nodeCRF {
             Random rn = new Random();
             for (int j=0; j<itr; j++) {
                 if (j != 0) {//1st iteration uses TL labeled to train
-                    int tmp = getIDByFI(learner, train);//get ID by FI, idx in trainlist to query, real instance ID is train.get(tmp)
-                    //int tmp = getIDByUncertainty(learner, train);//get ID by uncertainty - posterior prob
+                    //int tmp = getIDByFI(learner, train);//get ID by FI, idx in trainlist to query, real instance ID is train.get(tmp)
+                    int tmp = getIDByUncertainty(learner, train);//get ID by uncertainty - posterior prob
                     //int tmp = rn.nextInt(train.size()); //random sampling
                     int idx = train.get(tmp);
                     trainX.add(featureTable.get(idx));

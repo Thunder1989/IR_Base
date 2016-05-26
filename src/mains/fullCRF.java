@@ -292,13 +292,13 @@ public class fullCRF {
 
       Inferencer inf = new LoopyBP();
       inf.computeMarginals(mdl);
-        
+       /* 
       Factor ptl = inf.lookupMarginal (mdl.getFactor(0));
       for (AssignmentIterator it = ptl.assignmentIterator (); it.hasNext (); it.advance()) {
           int outcome = it.indexOfCurrentAssn ();
           System.out.println (outcome+"   "+ptl.value(it));
       }
-
+*/
         double p = inf.lookupLogJoint(new Assignment(new Variable[] {vars[0],vars[1], vars[2]}, new int[] {0,0,0}));
         System.out.println(p);
         //TO-DO, for CRF with edge features
