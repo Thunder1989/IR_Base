@@ -35,7 +35,7 @@ public class nodeCRF {
                 label[i] = Integer.parseInt(tmp[i]);
             
             int ctr = 0;
-            HashMap<Integer, int[]> tMap = new HashMap<Integer, int[]> ();
+            HashMap<Integer, int[]> tMap = new HashMap<Integer, int[]> (); //the feature map for each instance
             while ((line = file.readLine()) != null) {
                 tmp = line.split(",");
                 int[] tFeature = new int[numFeature];

@@ -52,12 +52,12 @@ public class ALogisticRegression {
 	* turns to 0, it finds the final point and we get the best beta.
 	*/	
 	public double train(ArrayList<HashMap<Integer, int[]>> trainX, int[] trainY) {
-		int[] iflag = {0}, iprint = { -1, 3 };
+		int[] iflag = { 0 }, iprint = { -1, 3 };
 		double fValue = 0;
 		int fSize = m_beta.length;
 
 		init();
-		try{
+		try {
 			do {
 				fValue = calcFuncGradient(trainX, trainY);
 				LBFGS.lbfgs(fSize, 6, m_beta, fValue, m_g, false, m_diag, iprint, 1e-4, 1e-20, iflag);
@@ -72,14 +72,14 @@ public class ALogisticRegression {
 	//calculate Pij = P(Yi=j|Xi) in multi-class LR.
 	protected void calcPosterior(HashMap<Integer, int[]> Xi, double[] prob) {
 		int offset = 0;
-		for(int i = 0; i < m_classNo; i++) {
+		for (int i = 0; i < m_classNo; i++) {
 			offset = i * (m_featureSize + 1);
 			prob[i] = Utils.dotProduct(m_beta, Xi.get(i), offset);
 		}
 
 		double logSum = Utils.logSumOfExponentials(prob);
-		for(int i = 0; i < m_classNo; i++)
-			prob[i] = Math.exp(prob[i] - logSum);
+		for (int i = 0; i < m_classNo; i++)
+            prob[i] = Math.exp(prob[i] - logSum);
 	}
 
 	//calculate the value and gradient with the new beta.
@@ -87,16 +87,16 @@ public class ALogisticRegression {
 		double gValue = 0, fValue = 0;
 		double Pij = 0, logPij = 0;
 
-		//Add the L2 regularization.
+		//L2 regularization.
 		double L2 = 0, b;
-		for(int i = 0; i < m_beta.length; i++) {
+		for (int i = 0; i < m_beta.length; i++) {
 			b = m_beta[i];
 			m_g[i] = 2 * m_lambda * b;
 			L2 += b * b;
 		}
 
-		//time complexity is n*classNo.
-		for(int i=0; i<trainY.length; i++) {
+		//time complexity is N*classNo.
+		for (int i=0; i<trainY.length; i++) {
 			//trainSet is ArrayList<HashMap<int, int[]>>
 			//each element is the feature table for an instance
 			//features for each class label k is instance.get(k)
@@ -105,10 +105,14 @@ public class ALogisticRegression {
 			double weight;
 			weight = 1; //no weighting right now
 
-			//compute P(Y=j|X=xi)
+			//compute P(Y_i=j | X_i)
 			calcPosterior(Xi, m_cache);
-			for(int j = 0; j < m_classNo; j++) {
-				Pij = m_cache[j];
+			
+            for (int j = 0; j < m_classNo; j++) {
+                //should be one weight for each advanced node feature, so set all w_ at different offset the same 
+			    //TBD	
+                
+                Pij = m_cache[j];
 				logPij = Math.log(Pij);
 				if (Yi == j) {
 					gValue = Pij - 1.0;
@@ -121,7 +125,7 @@ public class ALogisticRegression {
 				m_g[offset] += gValue;
 				//(Yij - Pij) * Xi
 				int[] Xij = Xi.get(j);
-				for (int k=0; k<Xij.length; k++)
+				for (int k = 0; k < Xij.length; k++)
 					m_g[offset + k + 1] += gValue * Xij[k];
 			}
 		}
@@ -168,7 +172,6 @@ public class ALogisticRegression {
 
 		return m_cache[classNo] - Utils.logSumOfExponentials(m_cache);//in log space
 	}
-
 
 	//Save the parameters for classification.
 	public void saveModel(String modelLocation){
